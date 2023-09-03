@@ -26,6 +26,20 @@ pipeline {
                 
             }
         }
+
+         stage("Quality Gate"){
+             steps {
+
+                 
+          timeout(time: 1, unit: 'HOURS') {
+              def qg = waitForQualityGate()
+              if (qg.status != 'OK') {
+                  error "Pipeline aborted due to quality gate failure: ${qg.status}"
+              }
+          }
+        }
+      }        
+       
         
         stage("Code Coverage") {
             steps {
@@ -38,7 +52,7 @@ pipeline {
         stage ("Nexus Upload") {
             steps {
                 
-                nexusArtifactUploader artifacts: [[artifactId: 'myWebApp', classifier: '', file: 'myWebApp/target/myWebApp.war', type: 'war']], credentialsId: '81173d8c-1791-4db4-9289-194d0241e87e', groupId: 'com.dept.app', nexusUrl: 'ec2-3-21-33-28.us-east-2.compute.amazonaws.com:8081', nexusVersion: 'nexus3', protocol: 'http', repository: 'maven-snapshots', version: '1.0-SNAPSHOT'
+                nexusArtifactUploader artifacts: [[artifactId: 'myWebApp', classifier: '', file: 'myWebApp/target/myWebApp.war', type: 'war']], credentialsId: '81173d8c-1791-4db4-9289-194d0241e87e', groupId: 'com.dept.app', nexusUrl: 'ec2-18-217-252-27.us-east-2.compute.amazonaws.com:8081', nexusVersion: 'nexus3', protocol: 'http', repository: 'maven-snapshots', version: '1.0-SNAPSHOT'
                 
             }
         }
@@ -46,7 +60,7 @@ pipeline {
         stage("DEV Deploy"){
             steps {
                 echo "deploying to DEV Env"
-                deploy adapters: [tomcat9(credentialsId: 'aa2723f2-7bcf-46ad-9ebc-cec503e19b5d', path: '', url: 'http://ec2-3-138-126-199.us-east-2.compute.amazonaws.com:8080')], contextPath: null, war: '**/*.war'
+                deploy adapters: [tomcat9(credentialsId: 'aa2723f2-7bcf-46ad-9ebc-cec503e19b5d', path: '', url: 'http://ec2-3-22-130-125.us-east-2.compute.amazonaws.com:8080')], contextPath: null, war: '**/*.war'
                 
             }
         }
@@ -70,7 +84,7 @@ pipeline {
         stage("QA Deploy"){
             steps {
                 echo "deploying to QA Env"
-                deploy adapters: [tomcat9(credentialsId: 'aa2723f2-7bcf-46ad-9ebc-cec503e19b5d', path: '', url: 'http://ec2-3-138-126-199.us-east-2.compute.amazonaws.com:8080')], contextPath: null, war: '**/*.war'
+                deploy adapters: [tomcat9(credentialsId: 'aa2723f2-7bcf-46ad-9ebc-cec503e19b5d', path: '', url: 'http://ec2-3-22-130-125.us-east-2.compute.amazonaws.com:8080')], contextPath: null, war: '**/*.war'
                 
             }
         }
@@ -93,7 +107,7 @@ pipeline {
         stage("PROD Deploy"){
             steps {
                 echo "deploying to PROD Env"
-                deploy adapters: [tomcat9(credentialsId: 'aa2723f2-7bcf-46ad-9ebc-cec503e19b5d', path: '', url: 'http://ec2-3-138-126-199.us-east-2.compute.amazonaws.com:8080')], contextPath: null, war: '**/*.war'
+                deploy adapters: [tomcat9(credentialsId: 'aa2723f2-7bcf-46ad-9ebc-cec503e19b5d', path: '', url: 'http://ec2-3-22-130-125.us-east-2.compute.amazonaws.com:8080')], contextPath: null, war: '**/*.war'
                 
             }
         }
